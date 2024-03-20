@@ -1,25 +1,21 @@
-const express = require('express')
-const path = require('path')
-const morgan = require('morgan')
-const route = require('./routes')
+const express = require('express');
+const { userRoute } = require('./routes');
+const dotenv = require('dotenv');
+dotenv.config();
+const connect = require('./database');
 
-const app = express()
-const port = 3000
+const app = express();
 
-// USING STATIC FILE
-app.use(express.static(path.join(__dirname, 'public')))
+const PORT = process.env.PORT || 3000;
 
-app.use(express.urlencoded({
-  extended:true,
-}))
-app.use(express.json())
+app.use(express.json());
+app.use('/users', userRoute);
 
-// HTTP LOGGER
-// app.use(morgan('combined'))
+app.get('/', (req, res) => {
+  res.send('Response from ROOT ROUTER');
+});
 
-// ROUTES INIT
-route(app)
-
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+app.listen(PORT, async () => {
+  await connect();
+  console.log('Listening on port ' + PORT);
+});
